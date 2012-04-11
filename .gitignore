@@ -1,0 +1,6 @@
+# Git ignore file
+*~
+*.glob
+*.vo
+
+# end-of-.gitignore

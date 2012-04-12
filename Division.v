@@ -5,6 +5,7 @@
 (* Implementation of euclidean division. *)
 
 (* Fixpoints *)
+
 Fixpoint dividend_greater_than_diviser_p
   (dividend diviser : nat) : option nat :=
   match dividend, diviser with

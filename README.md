@@ -25,6 +25,7 @@ The idea behind this project is to show how to:
 
 ## To-do
 
+* Change syntax of tests from compute to lemma (or likewise) so verification can be automated.
 * Handle immediate action when A tries to subtract something greater than itself.
 * Add a Compiler and Stack etc. (probably have to rename project then).
 * Prove equivalence between the results of 'Compiler+Execute ae' and 'Interpret ae'.

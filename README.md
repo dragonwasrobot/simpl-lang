@@ -19,9 +19,9 @@ The idea behind this project is to create a small show how to:
   * Create simple byte code instructions for the language to be compiled to.
   * Create a function which can executes the byte code.
   * Write a simple compiler which compiles simpl lang source code into byte
-     code.
-  * Prove the equality of interpreting an expression written in simpl lang and
-     compiling it to byte code following by executing of that same bytecode.
+    code.
+  * Prove the equivalence between compiling and running a piece of simpl lang
+    source code and directly interpreting it.
   * Improve the compiler and prove equality.
 
 * Decompiler

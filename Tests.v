@@ -1,11 +1,11 @@
 (* File: Tests.v *)
 (* Author: Peter Urbak <peter@dragonwasrobot.com> *)
-(* Version: 2012-04-12 *)
+(* Version: 2012-05-02 *)
 
 (* Tests for the Simple CPS Interpreter project. *)
 
 (* -*- Requirements. -*- *)
-Require Export Division Arithmetic_Expression_Interpreter.
+Require Export Division Syntax Interpreter.
 
 (* -*- Tests - Division.v -*- *)
 Compute dividend_greater_than_diviser_p 10 3 = Some 7.

@@ -1,34 +1,20 @@
-(* File: Arithmetic-Expression-Interpreter.v *)
+(* File: Interpreter.v *)
 (* Author: Peter Urbak <peter@dragonwasrobot.com> *)
-(* Version: 2012-04-12 *)
+(* Version: 2012-05-02 *)
 
 (*
    This script shows how to:
-   1. Define the syntax for a simple (arithmetic) language.
-   2. Write a direct style interpreter for the language.
-   3. Convert it to a straightforward continuation passing style interpreter.
-   4. Optimize the interpreter such that it immediately halts when a division by
+   1. Write a direct style interpreter for the language.
+   2. Convert it to a straightforward continuation passing style interpreter.
+   3. Optimize the interpreter such that it immediately halts when a division by
    zero occurs.
-   5. Prove the correctness of the optimized interpreter in relation to the
+   4. Prove the correctness of the optimized interpreter in relation to the
    direct style interpreter.
 *)
 
 (* -*- Requirements. -*- *)
 
-Require Export Cases List Division.
-
-(* -*- The Source Syntax. -*- *)
-
-Inductive arithmetic_expression : Type :=
-  | Lit : nat -> arithmetic_expression
-  | Plus : arithmetic_expression -> arithmetic_expression ->
-    arithmetic_expression
-  | Minus : arithmetic_expression -> arithmetic_expression ->
-    arithmetic_expression
-  | Times : arithmetic_expression -> arithmetic_expression ->
-    arithmetic_expression
-  | Divide : arithmetic_expression -> arithmetic_expression ->
-    arithmetic_expression.
+Require Export Cases List Division Syntax.
 
 (* -*- Functions for doing basic arithmetic on the 'option nat' type. -*- *)
 
@@ -478,4 +464,4 @@ Proof.
   reflexivity.
 Qed.
 
-(* end-of-exam-project.v *)
+(* end-of-Interpreter.v *)

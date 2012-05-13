@@ -12,29 +12,31 @@
    direct style interpreter.
 *)
 
+(* Note: for pedagogical reasons, there is no use of tactics like simpl, auto,
+   etc. likewise, there are proofs which could be significantly shortened using
+   ';' but have also been left in their more explicit versions. *)
+
 (* -*- Requirements. -*- *)
 
 Require Export Cases List Division Syntax.
 
 (* -*- Functions for doing basic arithmetic on the 'option nat' type. -*- *)
 
-Definition lifted_plus (o1 o2 : option nat) : option nat :=
+Definition lifted_operator (o1 o2: option nat) (op : nat -> nat -> nat) :
+  option nat :=
   match o1, o2 with
-    | (Some n1), (Some n2) => Some(n1 + n2)
+    | (Some n1), (Some n2) => Some(op n1 n2)
     | _, _ => None
   end.
+
+Definition lifted_plus (o1 o2 : option nat) : option nat :=
+  lifted_operator o1 o2 plus.
 
 Definition lifted_minus (o1 o2 : option nat) : option nat :=
-  match o1, o2 with
-    | (Some n1), (Some n2) => Some(n1 - n2)
-    | _, _ => None
-  end.
+  lifted_operator o1 o2 minus.
 
 Definition lifted_times (o1 o2 : option nat) : option nat :=
-  match o1, o2 with
-    | (Some n1), (Some n2) => Some(n1 * n2)
-    | _, _ => None
-  end.
+  lifted_operator o1 o2 mult.
 
 Definition lifted_division (o1 o2 : option nat) : option nat :=
   match o1, o2 with
@@ -61,26 +63,24 @@ Fixpoint interpret (ae : arithmetic_expression) : option nat :=
 (* Naive CPS versions of the lifted_X functions where the continuation function
    k is also applied to None. *)
 
-Definition lifted_plus_cps (o1 o2 : option nat)
-  (k : option nat -> option nat) : option nat :=
+Definition lifted_operator_cps (o1 o2 : option nat)
+  (op: nat -> nat -> nat) (k : option nat -> option nat) : option nat :=
   match o1, o2 with
-    | (Some n1), (Some n2) => k (Some (n1 + n2))
+    | (Some n1), (Some n2) => k (Some (op n1 n2))
     | _, _ => k None
   end.
+
+Definition lifted_plus_cps (o1 o2 : option nat)
+  (k : option nat -> option nat) : option nat :=
+  lifted_operator_cps o1 o2 plus k.
 
 Definition lifted_minus_cps (o1 o2 : option nat)
   (k : option nat -> option nat) : option nat :=
-  match o1, o2 with
-    | (Some n1), (Some n2) => k (Some (n1 - n2))
-    | _, _ => k None
-  end.
+  lifted_operator_cps o1 o2 minus k.
 
 Definition lifted_times_cps (o1 o2 : option nat)
   (k : option nat -> option nat) : option nat :=
-  match o1, o2 with
-    | (Some n1), (Some n2) => k (Some (n1 * n2))
-    | _, _ => k None
-  end.
+  lifted_operator_cps o1 o2 mult k.
 
 Definition lifted_division_cps (o1 o2 : option nat)
   (k : option nat -> option nat) : option nat :=
@@ -121,76 +121,59 @@ Definition interpret' (ae : arithmetic_expression) : option nat :=
 
 (* Proofs - Relation *)
 
-Lemma relation_between_lifted_plus_and_lifted_plus_cps :
-  forall (o1 o2 : option nat) (k : option nat -> option nat),
+Lemma relation_between_lifted_operator_and_lifted_operator_cps :
+  forall (o1 o2 : option nat) (op : nat -> nat -> nat)
+    (k: option nat -> option nat),
+    k (lifted_operator o1 o2 op) = lifted_operator_cps o1 o2 op k.
+Proof.
+  intros o1 o2 op k.
+  case o1 as [ n | ].
+
+  Case "o1 = (Some n)".
+  unfold lifted_operator_cps.
+  unfold lifted_operator.
+  case o2 as [ n' | ].
+
+  SCase "o2 = (Some n')".
+  reflexivity.
+
+  SCase "o2 = None".
+  reflexivity.
+
+  Case "o1 = None".
+  unfold lifted_operator.
+  unfold lifted_operator_cps.
+  reflexivity.
+Qed.
+
+Corollary relation_between_lifted_plus_and_lifted_plus_cps :
+  forall (o1 o2 : option nat) (k: option nat -> option nat),
     k (lifted_plus o1 o2) = lifted_plus_cps o1 o2 k.
 Proof.
   intros o1 o2 k.
-  case o1 as [ n | ].
-
-  Case "o1 = (Some n)".
   unfold lifted_plus_cps.
   unfold lifted_plus.
-  case o2 as [ n' | ].
-
-  SCase "o2 = (Some n')".
-  reflexivity.
-
-  SCase "o2 = None".
-  reflexivity.
-
-  Case "o1 = None".
-  unfold lifted_plus.
-  unfold lifted_plus_cps.
-  reflexivity.
+  apply relation_between_lifted_operator_and_lifted_operator_cps.
 Qed.
 
-Lemma relation_between_lifted_minus_and_lifted_minus_cps :
-  forall (o1 o2 : option nat) (k : option nat -> option nat),
+Corollary relation_between_lifted_minus_and_lifted_minus_cps :
+  forall (o1 o2 : option nat) (k: option nat -> option nat),
     k (lifted_minus o1 o2) = lifted_minus_cps o1 o2 k.
 Proof.
   intros o1 o2 k.
-  case o1 as [ n | ].
-
-  Case "o1 = (Some n)".
   unfold lifted_minus_cps.
   unfold lifted_minus.
-  case o2 as [ n' | ].
-
-  SCase "o2 = (Some n')".
-  reflexivity.
-
-  SCase "o2 = None".
-  reflexivity.
-
-  Case "o1 = None".
-  unfold lifted_minus.
-  unfold lifted_minus_cps.
-  reflexivity.
+  apply relation_between_lifted_operator_and_lifted_operator_cps.
 Qed.
 
-Lemma relation_between_lifted_times_and_lifted_times_cps :
-  forall (o1 o2 : option nat) (k : option nat -> option nat),
+Corollary relation_between_lifted_times_and_lifted_times_cps :
+  forall (o1 o2 : option nat) (k: option nat -> option nat),
     k (lifted_times o1 o2) = lifted_times_cps o1 o2 k.
 Proof.
   intros o1 o2 k.
-  case o1 as [ n | ].
-
-  Case "o1 = Some n".
   unfold lifted_times_cps.
   unfold lifted_times.
-  case o2 as [ n' | ].
-
-  SCase "o2 = Some n'".
-  reflexivity.
-
-  SCase "o2 = None".
-  reflexivity.
-
-  Case "o1 = None".
-  unfold lifted_times.
-  unfold lifted_times_cps.
-  reflexivity.
+  apply relation_between_lifted_operator_and_lifted_operator_cps.
 Qed.
 
 Lemma relation_between_lifted_division_and_lifted_division_cps :

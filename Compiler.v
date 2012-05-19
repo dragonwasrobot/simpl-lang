@@ -10,6 +10,7 @@
    4. Prove the equivalence between compiling and running a piece of simpl lang
       source code and directly interpreting it.
 
+   TODO: Clean up the code and move tests to tests.v
 *)
 
 Require Export Plus Cases List Syntax Interpreter.
@@ -32,9 +33,6 @@ Definition byte_code_program := list byte_code_instruction.
 Definition data_stack := list (option nat).
 
 (* Execute Byte Code Instruction *)
-
-(* Note: All proofs compile but pretty sure the execute_program isn't working as
-   intended. *)
 
 Fixpoint execute_byte_code_instruction
   (bc : byte_code_instruction) (s : data_stack) : list (option nat) :=
@@ -153,9 +151,7 @@ Proof.
   reflexivity.
 Qed.
 
-(* ********** *)
-
-(* A simple compiler: *)
+(* A Simple Compiler *)
 
 Fixpoint compile (ae : arithmetic_expression) : byte_code_program :=
   match ae with
@@ -243,7 +239,8 @@ Qed.
 
 (* Compiler with accumulator. *)
 
-Fixpoint compile_aux (ae : arithmetic_expression) (a : byte_code_program) : byte_code_program :=
+Fixpoint compile_aux (ae : arithmetic_expression)
+  (a : byte_code_program) : byte_code_program :=
   match ae with
     | Lit n => PUSH (Some n) :: a
     | Plus e1 e2 => (compile_aux e2 (compile_aux e1 (ADD :: a)))
@@ -350,4 +347,4 @@ Qed.
 
 (* ********** *)
 
-(* end arithmetic-expressions.v *).
+(* end-of-Compiler.v *).

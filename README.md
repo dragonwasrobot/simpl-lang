@@ -31,8 +31,8 @@ The idea behind this project is to create a small show how to:
 
 - **Author:** Peter Urbak, peter@dragonwasrobot.com
 - **Created:** 2012-04-12
-- **Last Modified:** 2012-04-12
-- **URL:** https://github.com/dragonwasrobot/Simple-CPS-Interpreter
+- **Last Modified:** 2012-05-19
+- **URL:** https://github.com/dragonwasrobot/simpl-lang
 - **License:** Gnu General Public License
 
 ## Install
@@ -47,5 +47,4 @@ The idea behind this project is to create a small show how to:
 
 * Change syntax of tests from compute to lemma (or likewise) so verification can be automated.
 * Handle immediate action when A tries to subtract something greater than itself.
-* Prove equivalence between the results of 'Compiler+Execute ae' and 'Interpret ae'.
 * Small install script that compiles the coq files.

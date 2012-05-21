@@ -248,6 +248,4 @@ Proof.
   reflexivity.
 Qed.
 
-(* ********** *)
-
 (* end-of-Compiler.v *)

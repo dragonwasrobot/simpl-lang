@@ -14,7 +14,7 @@
 
 (* Note: for pedagogical reasons, there is no use of tactics like simpl, auto,
    etc. likewise, there are proofs which could be significantly shortened using
-   ';' but have also been left in their more explicit versions. *)
+   ';' and ;( || )' but have also been left in their more verbose versions. *)
 
 (* -*- Requirements. -*- *)
 
@@ -229,10 +229,8 @@ Proof.
 
   Case "ae = (Plus ae1 ae2)".
   intro k.
-  unfold interpret_cps.
-  fold interpret_cps.
-  unfold interpret.
-  fold interpret.
+  unfold interpret_cps; fold interpret_cps.
+  unfold interpret; fold interpret.
   rewrite <- IHae1.
   rewrite <- IHae2.
   rewrite relation_between_lifted_plus_and_lifted_plus_cps.
@@ -240,10 +238,8 @@ Proof.
 
   Case "ae = (Minus ae1 ae2)".
   intro k.
-  unfold interpret_cps.
-  fold interpret_cps.
-  unfold interpret.
-  fold interpret.
+  unfold interpret_cps; fold interpret_cps.
+  unfold interpret; fold interpret.
   rewrite <- IHae1.
   rewrite <- IHae2.
   rewrite <- relation_between_lifted_minus_and_lifted_minus_cps.
@@ -251,10 +247,8 @@ Proof.
 
   Case "ae = (Times ae1 ae2)".
   intro k.
-  unfold interpret_cps.
-  fold interpret_cps.
-  unfold interpret.
-  fold interpret.
+  unfold interpret_cps; fold interpret_cps.
+  unfold interpret; fold interpret.
   rewrite <- IHae1.
   rewrite <- IHae2.
   rewrite <- relation_between_lifted_times_and_lifted_times_cps.
@@ -262,10 +256,8 @@ Proof.
 
   Case "ae = (Divide ae1 ae2)".
   intro k.
-  unfold interpret_cps.
-  fold interpret_cps.
-  unfold interpret.
-  fold interpret.
+  unfold interpret_cps; fold interpret_cps.
+  unfold interpret; fold interpret.
   rewrite <- IHae1.
   rewrite <- IHae2.
   rewrite <- relation_between_lifted_division_and_lifted_division_cps.
@@ -330,10 +322,8 @@ Proof.
 
   Case "ae = (Plus ae1 ae2)".
   intro k.
-  unfold interpret_cps_opt.
-  fold interpret_cps_opt.
-  unfold interpret.
-  fold interpret.
+  unfold interpret_cps_opt; fold interpret_cps_opt.
+  unfold interpret; fold interpret.
   unfold lifted_plus.
   rewrite -> IHae1.
   case (interpret ae1) as [ n | ].
@@ -353,10 +343,8 @@ Proof.
 
   Case "ae = (Minus ae1 ae2)".
   intro k.
-  unfold interpret_cps_opt.
-  fold interpret_cps_opt.
-  unfold interpret.
-  fold interpret.
+  unfold interpret_cps_opt; fold interpret_cps_opt.
+  unfold interpret; fold interpret.
   unfold lifted_minus.
   rewrite -> IHae1.
   case (interpret ae1) as [ n | ].
@@ -376,10 +364,8 @@ Proof.
 
   Case "ae = (Times ae1 ae2)".
   intro k.
-  unfold interpret_cps_opt.
-  fold interpret_cps_opt.
-  unfold interpret.
-  fold interpret.
+  unfold interpret_cps_opt; fold interpret_cps_opt.
+  unfold interpret; fold interpret.
   unfold lifted_times.
   rewrite -> IHae1.
   case (interpret ae1) as [ n | ].
@@ -399,10 +385,8 @@ Proof.
 
   Case "ae = (Divide ae1 ae2)".
   intro k.
-  unfold interpret_cps_opt.
-  fold interpret_cps_opt.
-  unfold interpret.
-  fold interpret.
+  unfold interpret_cps_opt; fold interpret_cps_opt.
+  unfold interpret; fold interpret.
   unfold lifted_division.
   rewrite -> IHae1.
   case (interpret ae1) as [ n | ].

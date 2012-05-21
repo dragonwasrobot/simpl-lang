@@ -9,8 +9,6 @@
    3. Optimize the compiler and prove equivalence.
    4. Prove the equivalence between compiling and running a piece of simpl lang
       source code and directly interpreting it.
-
-   TODO: Clean up the code and move tests to tests.v
 *)
 
 Require Export Plus Cases List Syntax Interpreter.
@@ -52,25 +50,6 @@ Fixpoint execute_byte_code_instruction
     | DIV, n1 :: n2 :: s' => (lifted_division n1 n2) :: s'
   end.
 
-Example execute_div_instruction_example: (execute_byte_code_instruction
-  DIV ((Some 30) :: (Some 3) :: nil)) = (Some 10 :: nil).
-Proof. reflexivity. Qed.
-
-Compute (execute_byte_code_instruction (PUSH (Some 3)) (execute_byte_code_instruction
-  (PUSH (Some 5)) nil)) = (Some 3) :: (Some 5) :: nil.
-Compute (execute_byte_code_instruction ADD ((Some 2) :: (Some 3) :: nil)) =
-  (Some 5) :: nil.
-Compute (execute_byte_code_instruction MUL ((Some 3) :: (Some 7) :: nil)) =
-  (Some 21) :: nil.
-Compute (execute_byte_code_instruction MUL (execute_byte_code_instruction
-  (PUSH (Some 6)) (execute_byte_code_instruction (PUSH (Some 7)) nil))) =
-  ((Some 42) :: nil).
-Compute (execute_byte_code_instruction MUL ((Some 3) :: nil)) = ((Some 3) :: nil).
-Compute (execute_byte_code_instruction SUB ((Some 10) :: (Some 3) :: nil)) =
-((Some 7) :: nil).
-Compute (execute_byte_code_instruction DIV ((Some 30) :: (Some 3) :: nil)) =
-((Some 10) :: nil).
-
 (* Execute Byte Code Porgram *)
 
 Fixpoint execute_byte_code_program
@@ -80,10 +59,6 @@ Fixpoint execute_byte_code_program
     | bci :: bcp', s' =>
       execute_byte_code_program bcp' (execute_byte_code_instruction bci s')
   end.
-
-Example  execute_example_1: (execute_byte_code_program
-  ((PUSH (Some 3)) :: (PUSH (Some 30)) :: DIV :: nil) nil) = ((Some 10) :: nil).
-Proof. reflexivity. Qed.
 
 Lemma unfold_execute_byte_code_program_base_case :
   forall (s : data_stack),
@@ -101,28 +76,9 @@ Lemma unfold_execute_byte_code_program_inductive_case :
   execute_byte_code_program bcp (execute_byte_code_instruction bci s).
 Proof.
   intros bcp bci s.
-  unfold execute_byte_code_program.
-  fold execute_byte_code_program.
+  unfold execute_byte_code_program; fold execute_byte_code_program.
   reflexivity.
 Qed.
-
-Compute execute_byte_code_program
-((PUSH (Some 5)) :: (PUSH (Some 3)) :: ADD :: nil) nil = ((Some 8):: nil).
-Compute execute_byte_code_program
-((PUSH (Some 3)) :: (PUSH (Some 9)) :: DIV :: nil) nil = ((Some 3):: nil).
-Compute execute_byte_code_program
-((PUSH (Some 4)) :: (PUSH (Some 10)) :: SUB :: nil) nil = ((Some 6):: nil).
-
-
-Compute execute_byte_code_program (MUL :: nil)
-(execute_byte_code_program ((PUSH (Some 5)) :: (PUSH (Some 3)) :: ADD :: nil)
-  ((Some 3) :: nil))
-= ((Some 24) :: nil).
-
-Compute execute_byte_code_program (DIV :: nil)
-(execute_byte_code_program ((PUSH (Some 3)) :: (PUSH (Some 30)) :: SUB :: nil)
-  ((Some 4) :: nil))
-= ((Some 6) :: nil).
 
 (* Associativity *)
 
@@ -135,19 +91,16 @@ Proof.
 
   Case "p = nil".
   intros p2 s.
-  unfold execute_byte_code_program.
-  fold execute_byte_code_program.
+  unfold execute_byte_code_program; fold execute_byte_code_program.
   unfold app.
   reflexivity.
 
   Case "p = p' :: ps".
   intros p2 s.
-  unfold execute_byte_code_program.
-  fold execute_byte_code_program.
+  unfold execute_byte_code_program; fold execute_byte_code_program.
   rewrite <- IHps.
-  unfold execute_byte_code_program.
-  unfold app.
-  fold execute_byte_code_program.
+  rewrite <- app_comm_cons.
+  rewrite <- unfold_execute_byte_code_program_inductive_case.
   reflexivity.
 Qed.
 
@@ -161,12 +114,6 @@ Fixpoint compile (ae : arithmetic_expression) : byte_code_program :=
     | Times e1 e2 => (compile e2) ++ (compile e1) ++ (MUL :: nil)
     | Divide e1 e2 => (compile e2) ++ (compile e1) ++ (DIV :: nil)
   end.
-
-Compute execute_byte_code_program
-(compile (Times (Plus (Lit 3) (Lit 2)) (Plus (Lit 7) (Lit 3)))) nil = ((Some 50) :: nil).
-
-Compute execute_byte_code_program
-(compile (Times (Minus (Lit 10) (Lit 3)) (Divide (Lit 15) (Lit 3)))) nil = ((Some 35) :: nil).
 
 (* Equality of interpretation and compiling followed by running. *)
 
@@ -188,10 +135,8 @@ Proof.
 
   Case "ae = (Plus ae1 ae2)".
   intro s.
-  unfold interpret.
-  fold interpret.
-  unfold compile.
-  fold compile.
+  unfold interpret; fold interpret.
+  unfold compile; fold compile.
   rewrite ->2 execute_byte_code_program_is_associative.
   rewrite <- IHae1.
   rewrite <- IHae2.
@@ -201,10 +146,8 @@ Proof.
 
   Case "ae = (Minus ae1 ae2)".
   intro s.
-  unfold interpret.
-  fold interpret.
-  unfold compile.
-  fold compile.
+  unfold interpret; fold interpret.
+  unfold compile; fold compile.
   rewrite ->2 execute_byte_code_program_is_associative.
   rewrite <- IHae1.
   rewrite <- IHae2.
@@ -214,10 +157,8 @@ Proof.
 
   Case "ae = (Times ae1 ae2)".
   intro s.
-  unfold interpret.
-  fold interpret.
-  unfold compile.
-  fold compile.
+  unfold interpret; fold interpret.
+  unfold compile; fold compile.
   rewrite ->2 execute_byte_code_program_is_associative.
   rewrite <- IHae1.
   rewrite <- IHae2.
@@ -252,36 +193,6 @@ Fixpoint compile_aux (ae : arithmetic_expression)
 Definition compile' (ae : arithmetic_expression) : byte_code_program :=
   compile_aux ae nil.
 
-Compute execute_byte_code_program
-(compile' (Times (Plus (Lit 3) (Lit 2)) (Plus (Lit 7) (Lit 3)))) nil = ((Some 50) :: nil).
-
-Compute execute_byte_code_program
-(compile' (Times (Minus (Lit 10) (Lit 3)) (Divide (Lit 15) (Lit 3)))) nil = ((Some 35) :: nil).
-
-Lemma app_is_associative : forall (xs ys zs : byte_code_program),
-  (xs ++ ys) ++ zs = xs ++ (ys ++ zs).
-Proof.
-  intro xs.
-  induction xs as [ | x xs'].
-
-  Case "xs = nil".
-  intros ys zs.
-  unfold app.
-  reflexivity.
-
-  Case "xs = x :: xs'".
-  intros ys zs.
-  unfold app.
-  rewrite -> IHxs'.
-  unfold app.
-  reflexivity.
-Qed.
-
-Lemma nil_is_neutral_for_app_on_the_right : forall (xs : byte_code_program),
-  xs ++ nil = xs.
-Proof.
-  Admitted.
-
 Lemma equality_of_compile_and_compile_aux :
   forall (ae : arithmetic_expression) (a : byte_code_program),
     compile_aux ae a = (compile ae) ++ a.
@@ -298,53 +209,45 @@ Proof.
 
   Case "ae = (Plus ae1 ae2)".
   intro a.
-  unfold compile_aux.
-  fold compile_aux.
-  unfold compile.
-  fold compile.
+  unfold compile_aux; fold compile_aux.
+  unfold compile; fold compile.
   rewrite -> IHae1.
   rewrite -> IHae2.
-  rewrite ->2 app_is_associative.
-  simpl.
+  rewrite <-2 app_assoc.
+  unfold app at 5.
   reflexivity.
 
   Case "ae = (Minus ae1 ae2)".
   intro a.
-  unfold compile_aux.
-  fold compile_aux.
-  unfold compile.
-  fold compile.
+  unfold compile_aux; fold compile_aux.
+  unfold compile; fold compile.
   rewrite -> IHae1.
   rewrite -> IHae2.
-  rewrite ->2 app_is_associative.
-  simpl.
+  rewrite <-2 app_assoc.
+  unfold app at 5.
   reflexivity.
 
   Case "ae = (Times ae1 ae2)".
   intro a.
-  unfold compile_aux.
-  fold compile_aux.
-  unfold compile.
-  fold compile.
+  unfold compile_aux; fold compile_aux.
+  unfold compile; fold compile.
   rewrite -> IHae1.
   rewrite -> IHae2.
-  rewrite ->2 app_is_associative.
-  simpl.
+  rewrite <-2 app_assoc.
+  unfold app at 5.
   reflexivity.
 
   Case "ae = (Divide ae1 ae2)".
   intro a.
-  unfold compile_aux.
-  fold compile_aux.
-  unfold compile.
-  fold compile.
+  unfold compile_aux; fold compile_aux.
+  unfold compile; fold compile.
   rewrite -> IHae1.
   rewrite -> IHae2.
-  rewrite ->2 app_is_associative.
-  simpl.
+  rewrite <-2 app_assoc.
+  unfold app at 5.
   reflexivity.
 Qed.
 
 (* ********** *)
 
-(* end-of-Compiler.v *).
+(* end-of-Compiler.v *)

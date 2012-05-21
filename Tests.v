@@ -2,10 +2,16 @@
 (* Author: Peter Urbak <peter@dragonwasrobot.com> *)
 (* Version: 2012-05-02 *)
 
-(* Tests for the Simple CPS Interpreter project. *)
+(* TODO: Turn all compute into Example to programatically check all tests, e.g.
+Example  execute_example_1: (execute_byte_code_program
+  ((PUSH (Some 3)) :: (PUSH (Some 30)) :: DIV :: nil) nil) = ((Some 10) :: nil).
+Proof. reflexivity. Qed.
+*)
 
 (* -*- Requirements. -*- *)
-Require Export Division Syntax Interpreter.
+Require Export Division Syntax Interpreter Compiler.
+
+(* -*- Tests Interpreter.v -*- *)
 
 (* -*- Tests - Division.v -*- *)
 Compute dividend_greater_than_diviser_p 10 3 = Some 7.
@@ -14,7 +20,7 @@ Compute dividend_greater_than_diviser_p 10 12 = None.
 Compute quotient_and_remainder 11 3 = Some(3, 2).
 Compute quotient_and_remainder 15 5 = Some(3 ,0).
 
-(* -*- Tests - Arithmetic-Expression-Interpreter.v -*- *)
+(* -*- Tests - Interpreter.v -*- *)
 
 (* Tests - lifted_X functions *)
 
@@ -274,5 +280,53 @@ Compute (interpret'_opt (Plus (Times (Lit 2) (Lit 6)) (Times (Lit 6) (Lit 5)))) 
 Some 42.
 
 Compute (interpret'_opt (Divide (Lit 5) (Lit 0))) = None.
+
+(* -*- Tests Compiler.v -*- *)
+
+Compute (execute_byte_code_instruction (PUSH (Some 3)) (execute_byte_code_instruction
+  (PUSH (Some 5)) nil)) = (Some 3) :: (Some 5) :: nil.
+Compute (execute_byte_code_instruction ADD ((Some 2) :: (Some 3) :: nil)) =
+  (Some 5) :: nil.
+Compute (execute_byte_code_instruction MUL ((Some 3) :: (Some 7) :: nil)) =
+  (Some 21) :: nil.
+Compute (execute_byte_code_instruction MUL (execute_byte_code_instruction
+  (PUSH (Some 6)) (execute_byte_code_instruction (PUSH (Some 7)) nil))) =
+  ((Some 42) :: nil).
+Compute (execute_byte_code_instruction MUL ((Some 3) :: nil)) = ((Some 3) :: nil).
+Compute (execute_byte_code_instruction SUB ((Some 10) :: (Some 3) :: nil)) =
+((Some 7) :: nil).
+Compute (execute_byte_code_instruction DIV ((Some 30) :: (Some 3) :: nil)) =
+((Some 10) :: nil).
+
+Compute execute_byte_code_program
+((PUSH (Some 5)) :: (PUSH (Some 3)) :: ADD :: nil) nil = ((Some 8):: nil).
+Compute execute_byte_code_program
+((PUSH (Some 3)) :: (PUSH (Some 9)) :: DIV :: nil) nil = ((Some 3):: nil).
+Compute execute_byte_code_program
+((PUSH (Some 4)) :: (PUSH (Some 10)) :: SUB :: nil) nil = ((Some 6):: nil).
+
+Compute execute_byte_code_program (MUL :: nil)
+(execute_byte_code_program ((PUSH (Some 5)) :: (PUSH (Some 3)) :: ADD :: nil)
+  ((Some 3) :: nil))
+= ((Some 24) :: nil).
+
+Compute execute_byte_code_program (DIV :: nil)
+(execute_byte_code_program ((PUSH (Some 3)) :: (PUSH (Some 30)) :: SUB :: nil)
+  ((Some 4) :: nil))
+= ((Some 6) :: nil).
+
+Compute execute_byte_code_program
+(compile (Times (Plus (Lit 3) (Lit 2)) (Plus (Lit 7) (Lit 3)))) nil = ((Some 50) :: nil).
+
+Compute execute_byte_code_program
+(compile (Times (Minus (Lit 10) (Lit 3)) (Divide (Lit 15) (Lit 3)))) nil = ((Some 35) :: nil).
+
+Compute compile (Times (Plus (Lit 3) (Lit 2)) (Plus (Lit 7) (Lit 3))).
+
+Compute execute_byte_code_program
+(compile' (Times (Plus (Lit 3) (Lit 2)) (Plus (Lit 7) (Lit 3)))) nil = ((Some 50) :: nil).
+
+Compute execute_byte_code_program
+(compile' (Times (Minus (Lit 10) (Lit 3)) (Divide (Lit 15) (Lit 3)))) nil = ((Some 35) :: nil).
 
 (* end-of-Tests.v *)

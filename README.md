@@ -31,17 +31,17 @@ The idea behind this project is to create a small show how to:
 
 - **Author:** Peter Urbak, peter@dragonwasrobot.com
 - **Created:** 2012-04-12
-- **Last Modified:** 2012-05-19
+- **Last Modified:** 2012-05-25
 - **URL:** https://github.com/dragonwasrobot/simpl-lang
 - **License:** Gnu General Public License
 
 ## Install
 
-- Simply compile the Division.v and Cases.v files using the coqc command.
-- If you don't have Coq installed you can get it here http://coq.inria.fr/ (at
-- the same time I will also recommend using http://proofgeneral.inf.ed.ac.uk/
-- for emacs). Coq and Proofgeneral can usually also be installed using either
-- your favorite Linux repository or Homebrew for OS/X.
+Simply compile the Division.v and Cases.v files using the coqc command.
+If you don't have Coq installed you can get it here http://coq.inria.fr/ (at
+the same time I will also recommend using http://proofgeneral.inf.ed.ac.uk/
+for emacs). Coq and Proofgeneral can usually also be installed using either
+your favorite Linux repository or Homebrew for OS/X.
 
 ## To-do
 

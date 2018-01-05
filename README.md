@@ -27,14 +27,6 @@ The idea behind this project is to create a small show how to:
 * Decompiler
   * Write a decompiler which converts bytecode back into source code.
 
-## General
-
-- **Author:** Peter Urbak, peter@dragonwasrobot.com
-- **Created:** 2012-04-12
-- **Last Modified:** 2012-05-25
-- **URL:** https://github.com/dragonwasrobot/simpl-lang
-- **License:** Gnu General Public License
-
 ## Install
 
 Simply compile the Division.v and Cases.v files using the coqc command.
